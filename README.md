@@ -39,12 +39,14 @@ Browse the application at this URL:
 `http://localhost:5000/`
 
 ## Context
-This catalog is all about sharing grudges, reading and sharing
-Grudget = grudge bucket / aka grudge category
+This catalog is all about sharing grudges, reading others grudges
+
+Grudget = grudge bucket,  aka grudge category
+
 Grudge = a story worth sharing, a child of a grudget
 
 CRUD Operations
---All users can create grudgets (grudge category)
+--All users can create grudgets (grudge bucket)
 --Only the author of the grudget can edit / delete a grudget
 --Any authenticated user can create grudges against any existing grudgets
 
