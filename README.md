@@ -32,6 +32,10 @@ Then run the application:
 
 `python finalproject.py`
 
+Browse the application at this URL:
+
+`http://localhost:5000/`
+
 ## Context
 This catalog is all about sharing grudges, reading and sharing
 Grudget = grudge bucket / aka grudge category
@@ -42,6 +46,4 @@ CRUD Operations
 --Only the author of the grudget can edit / delete a grudget
 --Any authenticated user can create grudges against any existing grudgets
 
-Browse the application at this URL:
 
-`http://localhost:5000/`
