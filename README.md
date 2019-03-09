@@ -22,10 +22,12 @@ Then move inside the catalog folder:
 
 `cd /vagrant/catalog`
 
-Create database
+Create database:
+
 `python database_setup.py`
 
-Load data
+Load data:
+
 `python lotsofgrudges.py`
 
 Then run the application:
