@@ -42,22 +42,24 @@ h3 {
 	padding: 0;
 }
 .btn {
-	padding: 20px;
-	margin: 0;
-	border-color: #9FB80A;
-	border-width: 2px;
-	color: #9FB80A;
+border: 2px solid transparent;
+background: #3498DB;
+color: #ffffff;
+font-size: 16px;
+line-height: 25px;
+padding: 10px 0;
+text-decoration: none;
+text-shadow: none;
+border-radius: 3px;
+box-shadow: none;
+transition: 0.25s;
+display: block;
+width: 250px;
+margin: 0 auto;
 }
+ 
 .btn:hover {
-	border-color: #9FB80A;
-}
-.btn.delete {
-	border-color: #aaaaaa;
-	color: #aaaaaa;
-}
-.btn.delete:hover {
-	border-color: #aaaaaa;
-	color: red;
+background-color: #2980B9;
 }
 
 
@@ -85,6 +87,7 @@ h3 {
 }
 .grudge figcaption{
 	font-size: 14px;
+	text-align: right;
 	
 
 }
@@ -92,7 +95,7 @@ h3 {
 	
 	width: 50px;
 	border-radius: 50%;
-	margin-left: -20px;
+	margin-right: -20px;
 
 }
 
@@ -113,6 +116,7 @@ h3 {
 .creator img {
 	width: 100px;
 	border-radius: 50%;
+	text-align: right;
 }
 .creator figcaption {
 	font-size: 14px;

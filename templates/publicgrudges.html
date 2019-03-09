@@ -24,14 +24,15 @@
 				
 					{% for g in grudges %}
 							<div class="grudge">
-								<img src="{{ creator.picture}}">
-								<h3>Grudge: {{g.name}}</h3> 
-								<p>Description: {{g.description}}</p>
-								<p>Processed: {{g.processed}}</p>
-								<p>Takeaway: {{g.takeaway}}</p>
+								<figcaption>{{ creator.name }}</figcaption>
+								<h3>{{g.name}}</h3> 
+								<p>{{g.description}}</p>
+								<p>Are we over this? {{g.processed}}</p>
+								<p>{{g.takeaway}}</p>
+								<p><img src="{{ creator.picture}}"></p>
 								<a href='{{url_for('editGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Edit</a> | 
 								<a href='{{url_for('deleteGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Delete</a>
-								<figcaption>{{ creator.name }}</figcaption>
+								
 							</div>
 						
 					{% endfor %}

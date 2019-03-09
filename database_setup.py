@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = 'User'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
@@ -18,7 +18,7 @@ class Grudget(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('User.id'))
     user = relationship(User)
 
     @property
@@ -36,11 +36,11 @@ class Grudge(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
     description = Column(String(450),nullable=False)
-    processed = Column(String(5))
+    processed = Column(String(15))
     takeaway = Column(String(250))
     grudget_id = Column(Integer, ForeignKey('Grudget.id'))
     grudget = relationship(Grudget)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('User.id'))
     user = relationship(User)
 
     @property

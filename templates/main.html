@@ -14,26 +14,22 @@
 					<h1>Grudget Catalog</h1>
 				</a>
 				<div >
-				
-					<a href="{{url_for('showLogin')}}" >Login
-					</a>
-					<a href="{{url_for('disconnect')}}" >Logout
-					</a>
-					
+					<a href="{{url_for('gdisconnect')}}" >Logout</a>
+					<a href="{{url_for('showLogin')}}" >Login</a>
 				</div>
 				<div class = 'flash'>
 		      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-          
-        <ul>
-        {% for message in messages %}
-            <li> <strong> {{ message }} </strong> </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-    {% endwith %}
+			      {% if messages %}
+			          
+			        <ul>
+			        {% for message in messages %}
+			            <li> <strong> {{ message }} </strong> </li>
+			        {% endfor %}
+			        </ul>
+			        {% endif %}
+			    {% endwith %}
 
-</div>
+	</div>
 			</div>
 		</header>
 		<div class="content">

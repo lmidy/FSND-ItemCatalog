@@ -25,7 +25,6 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-#Create anti-forgery state token
 
 # Create anti-forgery state token
 @app.route('/login')
@@ -37,7 +36,7 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-@app.route('/gconnect', methods=['POST'])
+@app.route('/gconnect', methods=['POST','GET'])
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['state']:
@@ -45,7 +44,9 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     # Obtain authorization code
-    code = request.data
+    request.get_data()
+    code = request.data.decode('utf-8')
+    #code = request.data
 
     try:
         # Upgrade the authorization code into a credentials object
@@ -64,6 +65,8 @@ def gconnect():
            % access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
+  
+
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -85,7 +88,7 @@ def gconnect():
         print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
-
+        #Chcek if user is alkready logged in
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
@@ -102,23 +105,51 @@ def gconnect():
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-
     data = answer.json()
-
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+    login_session['provider'] = 'google'
 
+    # see if user exists, if it doesn't make a new one
+    user_id = getUserID(data["email"])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
+    output += login_session['user_id']
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
     output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
     return output
+
+# User Helper Functions
+def createUser(login_session):
+    newUser = User(
+        name=login_session['username'], 
+        email=login_session['email'], 
+        picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
 
 
 # Disconnect based on provider
@@ -142,32 +173,39 @@ def disconnect():
     else:
         flash("You were not logged in")
         return redirect(url_for('showGrudgets'))
-# User Helper Functions
-
-
-def createUser(login_session):
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
-    session.add(newUser)
-    session.commit()
-    user = session.query(User).filter_by(email=login_session['email']).one()
-    return user.id
-
-
-def getUserInfo(user_id):
-    user = session.query(User).filter_by(id=user_id).one()
-    return user
-
-
-def getUserID(email):
-    try:
-        user = session.query(User).filter_by(email=email).one()
-        return user.id
-    except:
-        return None
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
+@app.route('/gdisconnect')
+def gdisconnect():
+        # Only disconnect a connected user.
+    access_token = login_session.get('access_token')
+    if access_token is None:
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    if result['status'] == '200':
+        # Reset the user's sesson.
+        del login_session['access_token']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
 
+        # response = make_response(json.dumps('Successfully disconnected.'), 200)
+        # response.headers['Content-Type'] = 'application/json'
+        response = redirect(url_for('showGrudgets'))
+        flash("You are now logged out.")
+        return response
+    else:
+        # For whatever reason, the given token was invalid.
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 
@@ -209,6 +247,7 @@ def newGrudget():
         return redirect('/login')
     if request.method == 'POST':
         newGrudget = Grudget(name=request.form['name'])
+        print newGrudget
         session.add(newGrudget)
         session.commit()
         return redirect(url_for('showGrudgets'))
@@ -219,12 +258,13 @@ def newGrudget():
 # # Edit a grudge bucket - should be protected, street cred
 @app.route('/grudget/<int:grudget_id>/edit/', methods=['GET', 'POST'])
 def editGrudget(grudget_id):
-    editedGrudget = session.query(
-        Grudget).filter_by(id=grudget_id).one()
+    editedGrudget = session.query(Grudget).filter_by(id=grudget_id).one()
+    user = session.query(User).filter_by(id=user_id).one()
+    creator = getUserInfo(grudget.user_id)
     if 'username' not in login_session:
         return redirect('/login')
-    if editGrudget.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('As juicy as this is, you are not authorized to edit this grudget. Please create your own grudget in order to edit.');}</script><body onload='myFunction()'>"
+    if user != login_session['user_id']:
+        return "<script>function myFunction() {alert('As juicy as this is, you are not authorized to edit this grudget. Please create your own grudget in oder to edit.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedGrudget.name = request.form['name']
@@ -239,7 +279,7 @@ def deleteGrudget(grudget_id):
     grudgetToDelete = session.query(Grudget).filter_by(id=grudget_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-    if grudgetToDelete.user_id != login_session['user_id']:
+    if user_id != login_session['user_id']:
         return "<script>function myFunction() {alert('As juicy as this is, you are not authorized to delete this grudget. Please create your own grudget in order to edit.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(grudgetToDelete)
@@ -255,29 +295,37 @@ def deleteGrudget(grudget_id):
 @app.route('/grudget/<int:grudget_id>/')
 @app.route('/grudget/<int:grudget_id>/grudge/')
 def showGrudge(grudget_id):
-    grudget = session.query(Grudget).filter_by(id=grudget_id).one()
+    grudget = session.query(Grudget).filter_by(id=grudget_id).first()
     creator = getUserInfo(grudget.user_id)
     grudges = session.query(Grudge).filter_by(grudget_id=grudget_id).all()
     if 'username' not in login_session:
-        return render_template('publicgrudges.html', grudges=grudges, id=grudget_id,grudget=grudget,creator=creator )
+        return render_template('publicgrudges.html', grudges=grudges, id=grudget_id,grudget=grudget, creator=creator)
     else:
         return render_template('showgrudge.html', grudges=grudges, id=grudget_id, grudget=grudget, creator=creator)
  
 
-# # Create a new grudge, SHOULD NOT BE PROTECTED
+# # Create a new grudge
 @app.route('/grudget/<int:grudget_id>/grudge/new/', methods=['GET', 'POST'])
 def newGrudge(grudget_id):
     if 'username' not in login_session:
         return redirect('/login')
     grudget = session.query(Grudget).filter_by(id=grudget_id).one()
+    user_id=login_session['user_id']
+    print user_id
+    creator = getUserInfo(grudget.user_id)
     # if login_session['user_id'] != grudget.user_id:
     #     return "<script>function myFunction() {alert('You are not authorized to add a grudge to this grudget.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
-            newGrudge = Grudge(name=request.form['name'], description=request.form[
-                           'description'], processed=request.form['processed'], takeaway=request.form['takeaway'], grudget_id=grudget_id, user_id=login_session['user_id'])
+            newGrudge = Grudge(
+                name=request.form['name'], 
+                description=request.form['description'], 
+                processed=request.form['processed'], 
+                takeaway=request.form['takeaway'], 
+                id=grudget_id, 
+                user_id=user_id)
             session.add(newGrudge)
             session.commit()
-            return redirect(url_for('showGrudge', grudget_id=grudget_id))
+            return redirect(url_for('showGrudge', grudget_id=grudget_id,creator=creator))
     else:
         return render_template('newgrudge.html', grudget_id=grudget_id)
 
@@ -289,7 +337,7 @@ def editGrudge(grudget_id, grudge_id):
         return redirect('/login')
     editgrudge = session.query(Grudge).filter_by(id=grudge_id).one()
     grudget = session.query(Grudget).filter_by(id=grudget_id).one()
-    if login_session['user_id'] != grudget.user_id:
+    if login_session['user_id'] != id.user_id:
         return "<script>function myFunction() {alert('You are not authorized to edit this grudge.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
@@ -307,7 +355,7 @@ def editGrudge(grudget_id, grudge_id):
         return render_template('editgrudge.html', grudget_id=grudget_id, grudge_id=grudge_id, grudge=editgrudge)
 
 
-# # Delete a grudge - Protected - do I need thsi before grudgetoDeletequery
+# # Delete a grudge - Protected -
 @app.route('/grudget/<int:grudget_id>/grudge/<int:grudge_id>/delete', methods=['GET', 'POST'])
 def deleteGrudge(grudget_id, grudge_id):
     if 'username' not in login_session:
