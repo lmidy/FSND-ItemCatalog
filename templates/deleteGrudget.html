@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+
+
+	<div class="row">
+		<div >
+			<h6 class="">
+				<span class="">Delete Grudget</span>
+				<span class=""></span>
+			</h6>
+			<form action="#" method = 'post'>
+				<h2> Are you sure you want to delete {{grudget.name}}? </h2>
+
+				<button type="submit" class="btn btn-default delete" id="submit" type="submit">
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</button>
+				<a href = '{{url_for('showGrudgets')}}'>
+				<button class="btn btn-default delete">
+				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
+				/a>
+			</form>
+
+		</div>
+	</div>
+
+{% endblock %}

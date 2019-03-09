@@ -1,0 +1,41 @@
+{% extends "main.html" %}
+{% block content %}
+
+	
+	
+	<div class="">
+		<div class="">
+			<h1>{{ grudget.name }}
+<!-- 			<figure class="creator">
+				<img src="{{ creator.picture}}">
+				<figcaption>{{ creator.name }}</figcaption>
+			</figure> -->
+			</h1>
+
+		</div>
+	</div>
+	
+	<div class="row">
+
+		{% if grudges !=[] %}	
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-6">
+				
+					{% for g in grudges %}
+							<div class="grudge">
+								<img src="{{ creator.picture}}">
+								<h3>Grudge: {{g.name}}</h3> 
+								<p>Description: {{g.description}}</p>
+								<p>Processed: {{g.processed}}</p>
+								<p>Takeaway: {{g.takeaway}}</p>
+								<a href='{{url_for('editGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Edit</a> | 
+								<a href='{{url_for('deleteGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Delete</a>
+								<figcaption>{{ creator.name }}</figcaption>
+							</div>
+						
+					{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}

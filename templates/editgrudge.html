@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block content %}
+
+	<div class="row">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row">
+		<div class="col-md-11 col-md-offset-1 ">
+			<h1>Edit </h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-1 ">
+			
+			<form action="#" method = "post">
+				<div class="form-group">
+					<label for="name">Name:</label>
+					<input type ="text" maxlength="100" class="form-control" name="name" value="{{grudge.name}}">
+
+					<label for="description">Description:</label>
+					<input type ="text" maxlength="250" class="form-control" name="description" value="{{grudge.description}}">
+					
+					<label for="processed">Processed?</label>
+					<input type ="text" maxlength="5" class="form-control" name="processed" value="{{grudge.processed}}">
+					
+					<label for="takeaway">Takeaway:</label>
+					<input type ="text" maxlength="250" class="form-control" name="takeaway" value="{{grudge.takeaway}}">
+					<div class="padding-bottom"></div>
+					<a href="{{url_for('showGrudge', grudget_id=grudget_id)}}" class="button button-outline">Back</a>
+				<input type="submit" value="Save">
+				
+				</div>
+			</form>
+			
+		</div>
+	</div>
+{% endblock %}
+
+	

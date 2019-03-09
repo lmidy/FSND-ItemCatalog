@@ -1,0 +1,133 @@
+* {
+	font-family: "Gill Sans", sans-serif;
+
+}
+
+h1 {
+	font-family: "Gill Sans", sans-serif;
+	font-size: 25px;
+	color: #16aab1;
+	line-height: 60px;
+	font-weight: 300;
+}
+
+h2 {
+	font-size: 20px;
+	color: #177b80
+	font-weight: 200;
+	line-height: 29px;
+}
+
+h3 {
+	font-size: 18px;
+	color: #0e494c
+	line-height: 23px;
+}
+ p {
+ 	font-family: "Gill Sans", sans-serif;
+ 	font-size: 16px;
+ 	color: #7B7573;
+ 	line-height: 24px;
+ 	font-weight: 400;
+ }
+
+
+.padding-bottom {
+	padding-bottom: 30px;
+}
+.margin-right {
+	margin-right: 30px;
+}
+.padding-none {
+	padding: 0;
+}
+.btn {
+	padding: 20px;
+	margin: 0;
+	border-color: #9FB80A;
+	border-width: 2px;
+	color: #9FB80A;
+}
+.btn:hover {
+	border-color: #9FB80A;
+}
+.btn.delete {
+	border-color: #aaaaaa;
+	color: #aaaaaa;
+}
+.btn.delete:hover {
+	border-color: #aaaaaa;
+	color: red;
+}
+
+
+.about {
+	background: #F0F0F1;
+	padding: 20px;
+	margin: 20px;
+	margin-left: -20px;
+	font-family: Snell Roundhand, cursive;
+	letter-spacing: 0.1em;
+	line-height: 1.6;
+
+}
+.grudge {
+	background: #F0F0F0;
+	padding: 20px;
+	margin: 20px;
+	margin-left: -20px;
+}
+.grudge-description {
+	font-family: Snell Roundhand, cursive;
+	letter-spacing: 0.1em;
+	line-height: 1.6;
+
+}
+.grudge figcaption{
+	font-size: 14px;
+	
+
+}
+.grudge img {
+	
+	width: 50px;
+	border-radius: 50%;
+	margin-left: -20px;
+
+}
+
+.row {
+	background: #f9f9f9;
+	margin: 20px;
+	margin-left: -20px;
+	border-bottom-width: 4px;
+	
+}
+
+.creator {
+	padding-right: 20px;
+	margin-top: -20px;
+	text-align: right;
+	float:right;
+}
+.creator img {
+	width: 100px;
+	border-radius: 50%;
+}
+.creator figcaption {
+	font-size: 14px;
+	color: #7B7573;
+	font-weight: 400;
+	margin-top: -20px;
+}
+.flash {
+	background-color: #98FB98;
+	width:100%;
+	text-decoration: none;
+
+}
+
+.flash li {
+	list-style-type: none;
+	text-align: center;
+}

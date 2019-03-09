@@ -1,0 +1,58 @@
+{% extends "main.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row ">
+		<div >
+		<!-- 	<h1>{{ grudget.name }}
+			<figure class="creator">
+				<img src="{{ creator.picture}}">
+				<figcaption>{{ creator.name }}</figcaption> -->
+			</figure>
+			</h1>
+		</div>
+	</div>
+	<div class="row ">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+			<a href="{{url_for('editGrudget', grudget_id = grudget.id )}}">
+				<button class="btn btn-default" id="new-grudge-item">
+					<span  aria-hidden="true">Edit Grudget
+				</button></span>
+			</a>
+			<a href="{{url_for('newGrudge', grudget_id = grudget.id )}}">
+				<button class="btn btn-default" id="new-grudge-item">
+					<span  aria-hidden="true">		Add Grudge
+				</button></span>
+			</a>
+						<a href="{{url_for('deleteGrudget', grudget_id = grudget.id )}}">
+				<button class="btn btn-default delete" id="delete-grudget">
+				<span  aria-hidden="true">	 Delete Grudget
+				</button></span>
+			</a>
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+	
+	{% if grudges !=[] %}	
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-6">
+				
+					{% for g in grudges %}
+							<div class="grudge">
+								<h3>{{g.name}}</h3> {{g.rating}}
+								<p>{{g.description}}</p>
+								<p>{{g.processed}}</p>
+								<p>{{g.takeaway}}</p>
+									<a href='{{url_for('editGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Edit</a> 
+									| 
+									<a href='{{url_for('deleteGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Delete</a> 
+							</div>
+						
+					{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
