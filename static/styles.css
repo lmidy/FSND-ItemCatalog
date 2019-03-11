@@ -5,33 +5,39 @@
 
 h1 {
 	font-family: "Gill Sans", sans-serif;
-	font-size: 25px;
-	color: #16aab1;
+	font-size: 32px;
+	color: #3a4664;
 	line-height: 60px;
 	font-weight: 300;
 }
 
 h2 {
-	font-size: 20px;
-	color: #177b80
+	font-size: 28px;
+	color: #eaa0a2;
 	font-weight: 200;
 	line-height: 29px;
 }
 
 h3 {
 	font-size: 18px;
-	color: #0e494c
+	color: #3a4664;
 	line-height: 23px;
 }
  p {
  	font-family: "Gill Sans", sans-serif;
- 	font-size: 16px;
+ 	font-size: 20px;
  	color: #7B7573;
- 	line-height: 24px;
+ 	line-height: 10px;
  	font-weight: 400;
  }
 
+a {
+	color: #3a4664;
+}
+header row {
 
+	text-align: right;
+}
 .padding-bottom {
 	padding-bottom: 30px;
 }
@@ -43,10 +49,10 @@ h3 {
 }
 .btn {
 border: 2px solid transparent;
-background: #3498DB;
-color: #ffffff;
+background: #eaa0a2;
+color: #ffd6d6;
 font-size: 16px;
-line-height: 25px;
+line-height: 20px;
 padding: 10px 0;
 text-decoration: none;
 text-shadow: none;
@@ -54,30 +60,54 @@ border-radius: 3px;
 box-shadow: none;
 transition: 0.25s;
 display: block;
-width: 250px;
+width: 120px;
 margin: 0 auto;
 }
  
 .btn:hover {
-background-color: #2980B9;
+background-color: #fff0f0;
+border-style: solid;
+border-color: #eaa0a2;
 }
 
-
+.login {
+	text-align: right;
+	
+}
 .about {
-	background: #F0F0F1;
+	background: #ffe3e3;
 	padding: 20px;
 	margin: 20px;
-	margin-left: -20px;
+	margin-left: -30px;
 	font-family: Snell Roundhand, cursive;
-	letter-spacing: 0.1em;
+	font-size: 18px;
+	letter-spacing: 10px;
 	line-height: 1.6;
 
 }
-.grudge {
-	background: #F0F0F0;
+.container {
+	background-color: #fff9f9;
+}
+.grudge-bucket {
+	background: #efb5b6;
 	padding: 20px;
 	margin: 20px;
 	margin-left: -20px;
+	transition: 0.25s;
+}
+}
+.grudge {
+	background: #fff9f9;
+	font-size: 15px;
+	padding: 20px;
+	margin: 20px;
+	margin-left: -20px;
+	border-style: solid;
+	border-color: #eaa0a2; 
+}
+.grudge h3{
+	color: #eaa0a2;
+	font-size: 20px;
 }
 .grudge-description {
 	font-family: Snell Roundhand, cursive;
@@ -100,12 +130,13 @@ background-color: #2980B9;
 }
 
 .row {
-	background: #f9f9f9;
+	
 	margin: 20px;
 	margin-left: -20px;
 	border-bottom-width: 4px;
-	
 }
+
+
 
 .creator {
 	padding-right: 20px;
@@ -125,9 +156,10 @@ background-color: #2980B9;
 	margin-top: -20px;
 }
 .flash {
-	background-color: #98FB98;
+	background-color: #dbdbdb;
 	width:100%;
 	text-decoration: none;
+	align-self: center;
 
 }
 

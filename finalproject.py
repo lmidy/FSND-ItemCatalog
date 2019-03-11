@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 from database_setup import Grudget, Base, Grudge, User
 from flask import session as login_session
 import random
@@ -14,17 +15,16 @@ import requests
 
 app = Flask(__name__)
 
-#Reminder to change application name one day
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Grudget Catalog"
 
 #Connect to database and create db session
-engine = create_engine('sqlite:///grudgebucketwithusers.db', connect_args={'check_same_thread': False})
+engine = create_engine('sqlite:///grudgebucketwithusers.db', connect_args={'check_same_thread':False},poolclass=StaticPool)
 Base.metadata.bind = engine
+
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
-
 
 # Create anti-forgery state token
 @app.route('/login')
@@ -36,96 +36,83 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-@app.route('/gconnect', methods=['POST','GET'])
+@app.route('/gconnect',methods=['POST'])
 def gconnect():
-    # Validate state token
+    print 'Executing gconnect'
+    with open('client_secrets.json','r') as file:
+        CLIENT_ID = json.load(file)['web']['client_id']
+    # Verify Anti Forgery State Token received from client
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    # Obtain authorization code
-    request.get_data()
-    code = request.data.decode('utf-8')
-    #code = request.data
-
+    # Store authorization code received from client
+    code = request.data
+    # Exchange authorization code with Google for a credentials object
     try:
-        # Upgrade the authorization code into a credentials object
+    # Create a Flow object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
+        # Exchange authorization code for a credentials token
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-
-    # Check that the access token is valid.
+    # Verify if access token is valid/working
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-           % access_token)
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url, 'GET')[1])
-  
-
-    # If there was an error in the access token info, abort.
+    result = json.loads(h.request(url,'GET')[1])
+    # Handle error if access token is not valid
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
-
-    # Verify that the access token is used for the intended user.
+    # Verify if access token is for the right user
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
         response = make_response(
-            json.dumps("Token's user ID doesn't match given user ID."), 401)
+        json.dumps("Token's user ID doesn't match given user ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-
-    # Verify that the access token is valid for this app.
+    # Verify if access token is for the right application
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
-            json.dumps("Token's client ID does not match app's."), 401)
+        json.dumps("Token's client ID does not match app's."), 401)
         print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
-        #Chcek if user is alkready logged in
+    # Verify if user is already logged in
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps('Current user is already connected.'),200)
         response.headers['Content-Type'] = 'application/json'
         return response
-
-    # Store the access token in the session for later use.
+    # Store access token for later use
     login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
-
-    # Get user info
+    # Get user details (name and email) from Google API
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
     data = answer.json()
     login_session['username'] = data['name']
-    login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-    login_session['provider'] = 'google'
-
-    # see if user exists, if it doesn't make a new one
-    user_id = getUserID(data["email"])
+    login_session['picture']=data['picture']
+    # Check if the user already exists in the database
+    user_id = getUserID(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
+    # Send Response back to the client
     output = ''
-    output += '<h1>Welcome, '
+    output += '<h1>Welcome '
     output += login_session['username']
-    output += login_session['user_id']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
+    output += '</h1>'
     return output
+
 
 # User Helper Functions
 def createUser(login_session):
@@ -136,11 +123,13 @@ def createUser(login_session):
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
-    return user.id
+    flash("createUSerfunction was called")
+    return user
 
 
 def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
+    flash("getUserFunction  was called")
     return user
 
 
@@ -172,12 +161,12 @@ def disconnect():
         return redirect(url_for('showGrudgets'))
     else:
         flash("You were not logged in")
-        return redirect(url_for('showGrudgets'))
+        return render_template('publicgrudgets.html')
+
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/gdisconnect')
 def gdisconnect():
-        # Only disconnect a connected user.
     access_token = login_session.get('access_token')
     if access_token is None:
         response = make_response(
@@ -194,9 +183,8 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-
-        # response = make_response(json.dumps('Successfully disconnected.'), 200)
-        # response.headers['Content-Type'] = 'application/json'
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
         response = redirect(url_for('showGrudgets'))
         flash("You are now logged out.")
         return response
@@ -231,13 +219,13 @@ def grudgetsJSON():
 
 # Show all grudgets/grudge buckets
 @app.route('/')
-@app.route('/grudget/')
+@app.route('/grudget/', methods=['GET'])
 def showGrudgets():
     grudgets = session.query(Grudget).all()
     if 'username' not in login_session:
-        return render_template('publicgrudgets.html', grudgets=grudgets)
+        return render_template('publicgrudgets.html', grudgets=grudgets, username=None)
     else:
-        return render_template('grudgets.html', grudgets=grudgets)
+        return render_template('grudgets.html', grudgets=grudgets, username=login_session['username'])
     
 
 # Create a new grudge bucket aka grudget
@@ -246,13 +234,12 @@ def newGrudget():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newGrudget = Grudget(name=request.form['name'])
-        print newGrudget
+        newGrudget = Grudget(name=request.form['name'],user_id=login_session['user_id'])
         session.add(newGrudget)
         session.commit()
         return redirect(url_for('showGrudgets'))
     else:
-        return render_template('newGrudget.html')
+        return render_template('newGrudget.html',username=login_session['username'])
 
 
 # # Edit a grudge bucket - should be protected, street cred
@@ -264,31 +251,28 @@ def editGrudget(grudget_id):
     if 'username' not in login_session:
         return redirect('/login')
     if user != login_session['user_id']:
-        return "<script>function myFunction() {alert('As juicy as this is, you are not authorized to edit this grudget. Please create your own grudget in oder to edit.');}</script><body onload='myFunction()'>"
+        flash("You cannot edit grudgets created by others.")
+        return redirect('/')
     if request.method == 'POST':
         if request.form['name']:
             editedGrudget.name = request.form['name']
             return redirect(url_for('showGrudgets'))
     else:
-        return render_template('editGrudget.html', grudget=editedGrudget)
+        return render_template('editGrudget.html', grudget=editedGrudget, username=login_session['username'])
 
 
 # # Delete a grudge bucket - Protected
 @app.route('/grudget/<int:grudget_id>/delete/', methods=['GET', 'POST'])
 def deleteGrudget(grudget_id):
     grudgetToDelete = session.query(Grudget).filter_by(id=grudget_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('As juicy as this is, you are not authorized to delete this grudget. Please create your own grudget in order to edit.');}</script><body onload='myFunction()'>"
-    if request.method == 'POST':
-        session.delete(grudgetToDelete)
-        session.commit()
-        return redirect(
-            url_for('showGrudgets', grudget_id=grudget_id))
+    if 'username' in login_session:
+        if login_session['user_id'] == grudget.user_id:
+            return render_template('deleteGrudget.html', grudget=grudgetToDelete,username=login_session['username'])
+        else:
+            flash("You cannot edit grudgets created by others.")
+            return redirect('/')
     else:
-        return render_template('deleteGrudget.html', grudget=grudgetToDelete)
- 
+        return redirect('/login')
 
 
 # Show a grudge
@@ -299,9 +283,9 @@ def showGrudge(grudget_id):
     creator = getUserInfo(grudget.user_id)
     grudges = session.query(Grudge).filter_by(grudget_id=grudget_id).all()
     if 'username' not in login_session:
-        return render_template('publicgrudges.html', grudges=grudges, id=grudget_id,grudget=grudget, creator=creator)
+        return render_template('publicgrudges.html', grudges=grudges, id=grudget_id,grudget=grudget, creator=creator,username=None)
     else:
-        return render_template('showgrudge.html', grudges=grudges, id=grudget_id, grudget=grudget, creator=creator)
+        return render_template('showgrudge.html', grudges=grudges, id=grudget_id, grudget=grudget, creator=creator, username=login_session['username'])
  
 
 # # Create a new grudge
@@ -310,9 +294,8 @@ def newGrudge(grudget_id):
     if 'username' not in login_session:
         return redirect('/login')
     grudget = session.query(Grudget).filter_by(id=grudget_id).one()
-    user_id=login_session['user_id']
-    print user_id
     creator = getUserInfo(grudget.user_id)
+    user_id=login_session['user_id']
     # if login_session['user_id'] != grudget.user_id:
     #     return "<script>function myFunction() {alert('You are not authorized to add a grudge to this grudget.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
@@ -327,7 +310,7 @@ def newGrudge(grudget_id):
             session.commit()
             return redirect(url_for('showGrudge', grudget_id=grudget_id,creator=creator))
     else:
-        return render_template('newgrudge.html', grudget_id=grudget_id)
+        return render_template('newgrudge.html', grudget_id=grudget_id,creator=creator )
 
 
 # # Edit a grudge - Protected
@@ -338,7 +321,8 @@ def editGrudge(grudget_id, grudge_id):
     editgrudge = session.query(Grudge).filter_by(id=grudge_id).one()
     grudget = session.query(Grudget).filter_by(id=grudget_id).one()
     if login_session['user_id'] != id.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to edit this grudge.');}</script><body onload='myFunction()'>"
+        flash("You cannot edit this grudge.")
+        return redirect('/')
     if request.method == 'POST':
         if request.form['name']:
             editgrudge.name = request.form['name']
@@ -360,9 +344,12 @@ def editGrudge(grudget_id, grudge_id):
 def deleteGrudge(grudget_id, grudge_id):
     if 'username' not in login_session:
         return redirect('/login')
+        print 'username'
+    grudget = session.query(Grudget).filter_by(id=grudget_id).first()
     grudgeToDelete = session.query(Grudge).filter_by(id=grudge_id).one()
     if login_session['user_id'] != grudget.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to delete any grudges not created by yourself. Please create your own grudges.');}</script><body onload='myFunction()'>"
+        flash("You cannot delete this grudge")
+        return redirect('/')
     if request.method == 'POST':
         session.delete(grudgeToDelete)
         session.commit()

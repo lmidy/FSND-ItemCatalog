@@ -4,7 +4,8 @@
 		<div class="col-md-12"></div>
 	</div>
 	<div class="row ">
-		<div >
+		<div class="col-md-1"></div>
+		<div class="col-md-11">
 		<h1>{{ grudget.name }}
 			<figure class="creator">
 				<img src="{{ creator.picture}}">
@@ -14,31 +15,47 @@
 		</div>
 	</div>
 	<div class="row ">
-		<div class="col-md-1"></div>
-		<div class="col-md-11 padding-none">
+		<div class="col-md-4 text-right" >
 			<a href="{{url_for('editGrudget', grudget_id = grudget.id )}}">
 				<button class="btn" id="new-grudge-item">
 					<span  aria-hidden="true">Edit Grudget
 				</button></span>
 			</a>
+		</div>
+			<div class="col-md-4" >
 			<a href="{{url_for('newGrudge', grudget_id = grudget.id )}}">
 				<button class="btn " id="new-grudge-item">
 					<span  aria-hidden="true">		Add Grudge
 				</button></span>
 			</a>
+		</div>
+			<div class="col-md-4 text-left" >
 						<a href="{{url_for('deleteGrudget', grudget_id = grudget.id )}}">
 				<button class="btn " id="delete-grudget">
 				<span  aria-hidden="true">	 Delete Grudget
 				</button></span>
 			</a>
 		</div>
-		<div class="col-md-7"></div>
+		
+	</div>
+
+	<div class = 'flash'>
+		      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    	{% endwith %}
 	</div>
 	
 	{% if grudges !=[] %}	
-		<div class="row">
+		<div class="row ">
 			<div class="col-md-1"></div>
-			<div class="col-md-6">
+			<div class="col-md-10">
 				
 				
 						{% for g in grudges %}
@@ -53,8 +70,10 @@
 								<a href='{{url_for('deleteGrudge', grudget_id = grudget.id, grudge_id=g.id ) }}'>Delete</a>
 								
 							</div>
-						
+
 					{% endfor %}
+					<div class="col-md-1"></div>
+						
 			</div>
 		</div>
 	{% endif %}

@@ -20,14 +20,25 @@
 		</div>
 		<div class="col-md-1"></div>
 	</div>
-	{% for grudget in grudgets %}
+	<div class = 'flash'>
+		      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+	</div>
+	
+		{% for grudget in grudgets %}
 		<a href = "{{url_for('showGrudge', grudget_id = grudget.id)}}">
-			<div class="row">
-				<div class="col-md-1"></div>
-					<div class="col-md-10 grudget-list">
-						<h3>{{grudget.name}}</h3>
-					</div>
-				<div class="col-md-1"></div>
+			<div class="row grudge-bucket">
+
+				<div class="col-md-10 grudget-list align=center"><h3>{{grudget.name}}</h3></div>
+			
 			</div>
 		</a>
 	{% endfor %} 

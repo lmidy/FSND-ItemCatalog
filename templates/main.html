@@ -13,9 +13,17 @@
 				<a href="/">
 					<h1>Grudget Catalog</h1>
 				</a>
-				<div >
-					<a href="{{url_for('gdisconnect')}}" >Logout</a>
-					<a href="{{url_for('showLogin')}}" >Login</a>
+				<div class="row">
+					<div class="col-md-10"></div>
+					<div class="col-md-2">
+						{%if not username %}
+						<button class="btn" ><a href="{{url_for('showLogin')}}"> Login </a></button>
+						{% endif %}
+						{% if username %}
+						<button class="btn" ><a href="{{url_for('disconnect')}}">Logout </a></button>
+						{% endif %}
+					
+					</div>
 				</div>
 				<div class = 'flash'>
 		      {% with messages = get_flashed_messages() %}

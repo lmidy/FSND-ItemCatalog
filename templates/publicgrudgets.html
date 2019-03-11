@@ -2,37 +2,31 @@
 {% block content %}
 
 
-<div class="row ">
+<div class="row">
   <div class="col-8">
    
-    <div class="row ">
-      <div class="col-6 ">
-		{% for grudget in grudgets %}
-			<a href = "{{url_for('showGrudge', grudget_id = grudget.id)}}">
-				<div class="row">
-				<div class="col-1"></div>
-				<div class="col-10"><h3>{{grudget.name}}</h3></div>
-				<div class="col-1"></div>
-			</div>
-			</a>
-		{% endfor %} </div>
+    <div class="row">
+      <div class="col-6">
+		  {% for grudget in grudgets %}
+		  	<a href = "{{url_for('showGrudge', grudget_id = grudget.id)}}">
+			 	  <div class="row grudge-bucket">
+				    <div class="col-1"></div>
+				    <div class="col-10"><h2>{{grudget.name}}</h2></div>
+				    <div class="col-1"></div>
+			   </div>
+			   </a>
+		    {% endfor %} 
+      </div>
       <div class="col-6 "></div>
     </div>
-  </div>
+    </div>
   <div class="col-4 about">
-  	<p>
-  	<h3>About</h3>
+  	 <p><h2>About</h2>
 
-  	Welcome to Grudges Catalog, a place to catalog, learn and share your grudges 
-  	and what you have learned from them.
-
-  </p>
-
-
-
-
-  </div>
+  	   Welcome to Grudges Catalog, a place to catalog, learn and share your grudges 
+  	   and what you have learned from them.
+     </p>
+   </div>
 </div>
-
 
 {% endblock %}
