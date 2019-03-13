@@ -31,6 +31,10 @@ Load data:
 ```
 python lotsofgrudges.py
 ```
+If grudges loaded succesfully you should see:
+```
+all grudges loaded, woot woot
+```
 Then run the application:
 ```
 python finalproject.py
