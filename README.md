@@ -64,3 +64,4 @@ Grudge = a story worth sharing, a child of a grudget, akin to item
 | Code Quality | PEP8 | Yes, on finalproject.py, not on database_setup.py
 | Code Quality | Are comments present? | Yes, also include flash on header of page to validate functions
 | README | README file included detailing all steps to run application | Yes
+| Issues | Known issues | Google button/function does not work in incognito window. 
