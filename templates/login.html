@@ -1,32 +1,25 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
-<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-  <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
-<script>
-  function start() {
-    gapi.load('auth2', function() {
-      auth2 = gapi.auth2.init({
-        client_id: '139911335983-7vqt2va1900s03ad41410a4fni9o6a8k.apps.googleusercontent.com'
-      });
-    });
-  }
-</script>
 
-<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+  <!-- LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+      <script>
+        function start() {
+          gapi.load('auth2', function() {
+            auth2 = gapi.auth2.init({
+              client_id: '139911335983-7vqt2va1900s03ad41410a4fni9o6a8k.apps.googleusercontent.com'
+            });
+          });
+        }
+      </script> 
 
-
+      <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 </head>
-
-
 <body>  
-<button id="signinButton" class="btn ">Google Signin</button>
-<div id="result"></div>
+  <button id="signinButton" class="btn">Google Signin</button>
+  <div id="result"></div> 
 
 
 
@@ -65,8 +58,10 @@
 
 
 <!--END GOOGLE PLUS SIGN IN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"  crossorigin="anonymous"></script>
+</body>
+</html>  
 
-  </body>
 
 
-  </html>

@@ -26,9 +26,18 @@
 					<label for="takeaway">Takeaway:</label>
 					<input type ="text" maxlength="250" class="form-control" name="takeaway" value="{{grudge.takeaway}}">
 					<div class="padding-bottom"></div>
-					<a href="{{url_for('showGrudge', grudget_id=grudget_id)}}" class="button button-outline">Back</a>
-				<input type="submit" value="Save">
+					
 				
+				
+
+				<a href="{{url_for('showGrudge', grudget_id=grudget_id)}}">
+				<button class="btn" id="new-grudge-item">
+					<span  aria-hidden="true">Save
+				</button></span>
+			</a>
+
+			<button class="btn btn-default delete">
+				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
 				</div>
 			</form>
 			

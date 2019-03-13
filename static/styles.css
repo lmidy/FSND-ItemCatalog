@@ -5,7 +5,7 @@
 
 h1 {
 	font-family: "Gill Sans", sans-serif;
-	font-size: 32px;
+	font-size: 36px;
 	color: #3a4664;
 	line-height: 60px;
 	font-weight: 300;
@@ -27,7 +27,7 @@ h3 {
  	font-family: "Gill Sans", sans-serif;
  	font-size: 20px;
  	color: #7B7573;
- 	line-height: 10px;
+ 	line-height: 20px;
  	font-weight: 400;
  }
 
@@ -92,9 +92,12 @@ border-color: #eaa0a2;
 	background: #efb5b6;
 	padding: 20px;
 	margin: 20px;
-	margin-left: -20px;
+	margin-left: 20px;
 	transition: 0.25s;
 }
+.col h2 {
+	color: #eaa0a2;
+
 }
 .grudge {
 	background: #fff9f9;
@@ -132,7 +135,7 @@ border-color: #eaa0a2;
 .row {
 	
 	margin: 20px;
-	margin-left: -20px;
+	margin-left: 25px;
 	border-bottom-width: 4px;
 }
 

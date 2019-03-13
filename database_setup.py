@@ -2,8 +2,10 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = 'User'
@@ -12,6 +14,7 @@ class User(Base):
     name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
     picture = Column(String(250))
+
 
 class Grudget(Base):
     __tablename__ = 'Grudget'
@@ -35,7 +38,7 @@ class Grudge(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
-    description = Column(String(450),nullable=False)
+    description = Column(String(450), nullable=False)
     processed = Column(String(15))
     takeaway = Column(String(250))
     grudget_id = Column(Integer, ForeignKey('Grudget.id'))
@@ -55,7 +58,8 @@ class Grudge(Base):
         }
 
 
-engine = create_engine('sqlite:///grudgebucketwithusers.db', connect_args={'check_same_thread': False})
-
+engine = create_engine(
+                'sqlite:///grudgebucketwithusers.db',
+                connect_args={'check_same_thread': False})
 
 Base.metadata.create_all(engine)
