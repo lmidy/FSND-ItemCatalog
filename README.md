@@ -38,16 +38,17 @@ Browse the application at this URL:
 
 `http://localhost:5000/`
 
-## Context
+## Context of Item Catalog
 This catalog is all about sharing grudges, reading others grudges
 
 Grudget = grudge bucket,  aka grudge category
 
-Grudge = a story worth sharing, a child of a grudget
+Grudge = a story worth sharing, a child of a grudget, akin to item
 
 CRUD Operations
 --All users can create grudgets (grudge bucket)
---Only the author of the grudget can edit / delete a grudget
+--Any Authenticated user can edit a grudget
+--Only the author can delete the grudget
 --Any authenticated user can create grudges against any existing grudgets
 
 
