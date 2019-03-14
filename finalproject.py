@@ -2,8 +2,11 @@ from flask import Flask, render_template, request
 from flask import redirect, jsonify, url_for, flash
 from flask import session as login_session
 from flask import make_response
-import random, string
-import httplib2, json, requests
+import random
+import string
+import httplib2
+import json
+import requests
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
@@ -37,10 +40,9 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-@app.route('/gconnect',methods=['POST'])
+@app.route('/gconnect', methods=['POST'])
 def gconnect():
-    print 'Executing gconnect'
-    with open('client_secrets.json','r') as file:
+    with open('client_secrets.json', 'r') as file:
         CLIENT_ID = json.load(file)['web']['client_id']
     # Verify Anti Forgery State Token received from client
     if request.args.get('state') != login_session['state']:
@@ -51,20 +53,23 @@ def gconnect():
     code = request.data
     # Exchange authorization code with Google for a credentials object
     try:
-    # Create a Flow object
+        # Create a Flow object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         # Exchange authorization code for a credentials token
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Verify if access token is valid/working
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    url =
+    ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+     % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url,'GET')[1])
+    result = json.loads(h.request(url, 'GET')[1])
     # Handle error if access token is not valid
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -74,13 +79,14 @@ def gconnect():
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
         response = make_response(
-        json.dumps("Token's user ID doesn't match given user ID."), 401)
+                   json.dumps("Token's user ID doesn't match given user ID."),
+                   401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Verify if access token is for the right application
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
-        json.dumps("Token's client ID does not match app's."), 401)
+                   json.dumps("Token's client ID does not match app's."), 401)
         print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -88,7 +94,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Store access token for later use
